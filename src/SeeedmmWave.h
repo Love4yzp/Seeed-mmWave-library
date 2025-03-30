@@ -55,7 +55,7 @@
 
 #endif
 
-#define MMWaveMaxQueueSize 120
+#define MMWaveMaxQueueSize 360
 
 class SeeedmmWave {
  private:
@@ -72,6 +72,7 @@ class SeeedmmWave {
                         uint8_t expected_checksum);
   float extractFloat(const uint8_t* bytes) const;
   uint32_t extractU32(const uint8_t* bytes) const;
+  int32_t extractI32(const uint8_t* bytes) const;
   void floatToBytes(float value, uint8_t* bytes);
   void uint32ToBytes(uint32_t value, uint8_t* bytes);
 

@@ -46,7 +46,7 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       break;
     }
     case TypeHeartBreath::Report3DPointCloudDetection: {
-      size_t target_num = extractU32(data);  // Extract target quantity
+      int32_t target_num = (int32_t)extractI32(data);  // Extract target quantity
       data += sizeof(uint32_t);
 
       std::vector<TargetN> received_targets; // Used to store parsed target data
@@ -55,17 +55,22 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       for(size_t i = 0; i < target_num; i++)
       {
         TargetN target;
+        target.cluster_index = extractI32(data);
+        data += sizeof(int32_t);
+
         target.x_point = extractFloat(data);
         data += sizeof(float);
 
         target.y_point = extractFloat(data);
         data += sizeof(float);
 
-        target.dop_index = extractU32(data);
-        data += sizeof(int32_t);
+        target.z_point = extractFloat(data);
+        data += sizeof(float);
 
-        target.cluster_index = extractU32(data);
-        data += sizeof(int32_t);
+        target.dop_index = extractFloat(data);
+        data += sizeof(float);
+
+        
 
         received_targets.push_back(target); // Add the resolved target to the container
       }
@@ -76,8 +81,9 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
 
       break;
     }
+
     case TypeHeartBreath::Report3DPointCloudTartgetInfo: {
-      size_t target_num = extractU32(data);  // Extract target quantity
+      int32_t target_num = (int32_t)extractI32(data);  // Extract target quantity
       data += sizeof(uint32_t);
 
       std::vector<TargetN> received_targets; // Used to store parsed target data
@@ -86,17 +92,22 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       for(size_t i = 0; i < target_num; i++)
       {
         TargetN target;
+        target.cluster_index = extractI32(data);
+        data += sizeof(int32_t);
+
         target.x_point = extractFloat(data);
         data += sizeof(float);
 
         target.y_point = extractFloat(data);
         data += sizeof(float);
 
-        target.dop_index = extractU32(data);
-        data += sizeof(int32_t);
+        target.z_point = extractFloat(data);
+        data += sizeof(float);
 
-        target.cluster_index = extractU32(data);
-        data += sizeof(int32_t);
+        target.dop_index = extractFloat(data);
+        data += sizeof(float);
+
+        
 
         received_targets.push_back(target); // Add the resolved target to the container
       }
@@ -165,6 +176,8 @@ bool SEEED_MR60BHA2::getPeopleCountingTartgetInfo(PeopleCounting& target_info) {
   target_info = std::move(_people_counting_target_info);
   return true;
 }
+
+
 
 bool SEEED_MR60BHA2::isHumanDetected() {
   if (!_isHumanDetectionValid)
