@@ -21,7 +21,9 @@
 #include <memory>
 #include <queue>
 
-#define _MMWAVE_DEBUG 0
+#ifndef _MMWAVE_DEBUG
+  #define _MMWAVE_DEBUG 0
+#endif
 
 #ifndef _UART_BAUD
 #  define _UART_BAUD 115200

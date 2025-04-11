@@ -107,6 +107,11 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
 
       break;
     }
+    case TypeHeartBreath::ReportFirmware: {
+      _firmware_info.value = extractU32(data);
+      _isFirmwareInfoValid = true;
+      break;
+    }
     default:
       return false;  // Unhandled type
   }
@@ -171,4 +176,12 @@ bool SEEED_MR60BHA2::isHumanDetected() {
     return false;
   _isHumanDetectionValid = false;
   return _isHumanDetected;
+}
+
+bool SEEED_MR60BHA2::getFirmwareInfo(FirmwareInfo& firmware_info) {
+  if (!_isFirmwareInfoValid)
+    return false;
+  _isFirmwareInfoValid = false;
+  firmware_info = std::move(_firmware_info);
+  return true;  
 }
