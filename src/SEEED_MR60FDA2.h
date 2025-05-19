@@ -13,7 +13,7 @@
 #define SEEED_MR60FDA2_H
 
 #include "SeeedmmWave.h"
-
+#include "SEEED_Public.h"
 enum class TypeFallDetection : uint16_t {
   UserLogInfo = 0x010E,
 
@@ -43,6 +43,8 @@ class SEEED_MR60FDA2 : public SeeedmmWave {
   float _rect_ZF;
   float _rect_ZB;
 
+
+
   /*set height*/
   bool _isHeightValid = false;
   bool _isThresholdValid;    // 0 : Failed to obtain  1 : acquisition successful
@@ -59,6 +61,14 @@ class SEEED_MR60FDA2 : public SeeedmmWave {
   bool _isFallValid  = false;
 
   bool getFallInternal();
+
+  /* PeopleCounting PointCloud */
+  PeopleCounting _people_counting_point_cloud;
+  bool _isPeopleCountingPointCloudValid;
+ 
+  /* PeopleCounting TartgetInfo */
+  PeopleCounting _people_counting_target_info;
+  bool _isPeopleCountingTartgetInfoValid;
  protected:
   bool getRadarParameters();
 
@@ -87,7 +97,9 @@ class SEEED_MR60FDA2 : public SeeedmmWave {
                           float& rect_ZF, float& rect_ZB);
 
   // bool get3DPointCloud(const int option);
-
+  bool getPeopleCountingPointCloud(PeopleCounting& point_cloud);
+  bool getPeopleCountingTartgetInfo(PeopleCounting& target_info);
+  
   bool getFall(bool &is_fall);
   bool getHuman(bool &is_human);
   bool getFall();

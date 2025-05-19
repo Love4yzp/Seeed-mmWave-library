@@ -167,7 +167,9 @@ float SeeedmmWave::extractFloat(const uint8_t* bytes) const {
 uint32_t SeeedmmWave::extractU32(const uint8_t* bytes) const {
   return *reinterpret_cast<const uint32_t*>(bytes);
 }
-
+int32_t SeeedmmWave::extractI32(const uint8_t* bytes) const{
+  return *reinterpret_cast<const int32_t*>(bytes);
+}
 /**
  * @brief Initialize the SeeedmmWave object.
  *
@@ -362,7 +364,7 @@ void SeeedmmWave::fetch(uint32_t timeout) {
         if (frameBuffer.size() >= SIZE_FRAME_HEADER)  // right package
         {
           frameDataSize = (frameBuffer[3] << 8 | frameBuffer[4]);
-          if (frameDataSize > 30) {
+          if (frameDataSize > 360) {
             startFrame = false;
             // Serial.println("FrameDataSize too large, clearing buffer");
             continue;

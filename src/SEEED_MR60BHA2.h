@@ -14,7 +14,7 @@
 #define SEEED_MR60BHA2_H
 
 #include "SeeedmmWave.h"
-
+#include "SEEED_Public.h"
 #define MAX_TARGET_NUM    3
 
 #define RANGE_STEP 17.28f
@@ -36,28 +36,6 @@ typedef struct HeartBreath {
   float heart_phase;
 } HeartBreath;
 
-typedef struct TargetN {
-  float x_point;
-  float y_point;
-  int32_t dop_index;
-  int32_t cluster_index;
-} TargetN;
-
-typedef struct FirmwareVersion {
-  uint8_t project_name;
-  uint8_t major_version;
-  uint8_t sub_version;
-  uint8_t modified_version;
-} FirmwareVersion;
-
-typedef union FirmwareInfo {
-  FirmwareVersion firmware_verson;
-  uint32_t value;
-};
-
-typedef struct PeopleCounting {
-  std::vector<TargetN> targets;
-} PeopleCounting;
 
 class SEEED_MR60BHA2 : public SeeedmmWave {
  private:
