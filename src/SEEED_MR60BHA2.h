@@ -27,6 +27,7 @@ enum class TypeHeartBreath : uint16_t {
   Report3DPointCloudDetection   = 0x0A08,
   Report3DPointCloudTartgetInfo = 0x0A04,
   ReportHumanDetection       = 0x0F09,
+  ReportFirmware          = 0xFFFF,
 };
 
 typedef struct HeartBreath {
@@ -34,7 +35,6 @@ typedef struct HeartBreath {
   float breath_phase;
   float heart_phase;
 } HeartBreath;
-
 
 
 class SEEED_MR60BHA2 : public SeeedmmWave {
@@ -64,6 +64,10 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   PeopleCounting _people_counting_target_info;
   bool _isPeopleCountingTartgetInfoValid;
 
+
+  FirmwareInfo _firmware_info;
+  bool _isFirmwareInfoValid     = false;
+
   bool _isHeartBreathPhaseValid = false;
   bool _isBreathRateValid       = false;
   bool _isHeartRateValid        = false;
@@ -85,6 +89,7 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   bool getPeopleCountingPointCloud(PeopleCounting& point_cloud);
   bool getPeopleCountingTartgetInfo(PeopleCounting& target_info);
   bool isHumanDetected();
+  bool getFirmwareInfo(FirmwareInfo& firmware_info);
 };
 
 #endif /*SEEED_MR60BHA2_H*/
