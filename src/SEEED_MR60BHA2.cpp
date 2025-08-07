@@ -76,7 +76,7 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
 
       break;
     }
-    case TypeHeartBreath::Report3DPointCloudTartgetInfo: {
+    case TypeHeartBreath::Report3DPointCloudTargetInfo: {
       size_t target_num = extractU32(data);  // Extract target quantity
       data += sizeof(uint32_t);
 
@@ -103,7 +103,7 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
 
       // Store the received target data in the PeopleCounting object
       _people_counting_target_info.targets = std::move(received_targets);
-      _isPeopleCountingTartgetInfoValid = true;
+      _isPeopleCountingTargetInfoValid = true;
 
       break;
     }
@@ -163,10 +163,10 @@ bool SEEED_MR60BHA2::getPeopleCountingPointCloud(PeopleCounting& point_cloud) {
   return true;
 }
 
-bool SEEED_MR60BHA2::getPeopleCountingTartgetInfo(PeopleCounting& target_info) {
-  if (!_isPeopleCountingTartgetInfoValid)
+bool SEEED_MR60BHA2::getPeopleCountingTargetInfo(PeopleCounting& target_info) {
+  if (!_isPeopleCountingTargetInfoValid)
     return false;
-  _isPeopleCountingTartgetInfoValid = false;
+  _isPeopleCountingTargetInfoValid = false;
   target_info = std::move(_people_counting_target_info);
   return true;
 }

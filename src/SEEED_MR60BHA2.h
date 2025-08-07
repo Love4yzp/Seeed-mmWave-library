@@ -25,7 +25,7 @@ enum class TypeHeartBreath : uint16_t {
   TypeHeartRate           = 0x0A15,
   TypeHeartBreathDistance = 0x0A16,
   Report3DPointCloudDetection   = 0x0A08,
-  Report3DPointCloudTartgetInfo = 0x0A04,
+  Report3DPointCloudTargetInfo = 0x0A04,
   ReportHumanDetection       = 0x0F09,
   ReportFirmware          = 0xFFFF,
 };
@@ -82,9 +82,9 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   PeopleCounting _people_counting_point_cloud;
   bool _isPeopleCountingPointCloudValid;
  
-  /* PeopleCounting TartgetInfo */
+  /* PeopleCounting TargetInfo */
   PeopleCounting _people_counting_target_info;
-  bool _isPeopleCountingTartgetInfoValid;
+  bool _isPeopleCountingTargetInfoValid;
 
 
   FirmwareInfo _firmware_info;
@@ -109,7 +109,7 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   bool getHeartRate(float& rate);
   bool getDistance(float& distance);
   bool getPeopleCountingPointCloud(PeopleCounting& point_cloud);
-  bool getPeopleCountingTartgetInfo(PeopleCounting& target_info);
+  bool getPeopleCountingTargetInfo(PeopleCounting& target_info);
   bool isHumanDetected();
   bool getFirmwareInfo(FirmwareInfo& firmware_info);
 };
