@@ -27,7 +27,7 @@ enum class TypeFallDetection : uint16_t {
   AlarmParameters               = 0x0E0C,
   RadarInitSetting              = 0x2110,
   Report3DPointCloudDetection   = 0x0A08,
-  Report3DPointCloudTartgetInfo = 0x0A04,
+  Report3DPointCloudTargetInfo = 0x0A04,
   ReportUnmannedDetection       = 0x0F09,
 };
 

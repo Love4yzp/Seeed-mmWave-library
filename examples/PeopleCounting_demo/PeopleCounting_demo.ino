@@ -25,7 +25,7 @@ void loop() {
     }
 
     PeopleCounting target_info;
-    if (mmWave.getPeopleCountingTartgetInfo(target_info)) {
+    if (mmWave.getPeopleCountingTargetInfo(target_info)) {
         Serial.printf("-----Got Target Info-----\n");
         Serial.printf("Number of targets: %zu\n", target_info.targets.size());
 
