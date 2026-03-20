@@ -349,7 +349,7 @@ void SeeedmmWave::fetch(uint32_t timeout) {
   static bool startFrame = false;
   static std::vector<uint8_t> frameBuffer;
   uint32_t expire_time = millis() + timeout;
-  uint8_t frameDataSize;
+  uint16_t frameDataSize;
   do {
     size_t c_available = _serial->available();
     while (c_available--) {
