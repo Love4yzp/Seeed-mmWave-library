@@ -349,7 +349,7 @@ void SeeedmmWave::fetch(uint32_t timeout) {
   static bool startFrame = false;
   static std::vector<uint8_t> frameBuffer;
   uint32_t expire_time = millis() + timeout;
-  uint8_t frameDataSize;
+  uint16_t frameDataSize;
   do {
     size_t c_available = _serial->available();
     while (c_available--) {
@@ -362,9 +362,8 @@ void SeeedmmWave::fetch(uint32_t timeout) {
         if (frameBuffer.size() >= SIZE_FRAME_HEADER)  // right package
         {
           frameDataSize = (frameBuffer[3] << 8 | frameBuffer[4]);
-          if (frameDataSize > 30) {
+          if (frameDataSize > FRAME_BUFFER_SIZE) {
             startFrame = false;
-            // Serial.println("FrameDataSize too large, clearing buffer");
             continue;
           }
           if (frameBuffer.size() ==
