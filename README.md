@@ -1,5 +1,27 @@
 # Seeed Arduino mmWave Library For XIAO
 
+> **Status (2026-04-19):** `main` is still the shipped **v1.0.0**. Two newer
+> versions are staged as GitHub prereleases and **have not yet been validated
+> on real hardware** — do not rely on them in production yet.
+>
+> - [**v1.1.0-rc1**](https://github.com/Love4yzp/Seeed-mmWave-library/releases/tag/v1.1.0-rc1)
+>   (branch `release/1.1.0-rc`) — housekeeping only: example reorg,
+>   optional `extras/` helpers for the onboard BH1750 / WS2812, fixed
+>   metadata, rewritten README. No public API changes.
+> - [**v2.0.0-rc1**](https://github.com/Love4yzp/Seeed-mmWave-library/releases/tag/v2.0.0-rc1)
+>   (branch `v2-dev`) — adds the event callback API (`onBreathRate`,
+>   `onFall`, `onError`, …), a `Status` enum and `read*()` siblings to
+>   every getter, a `stats()` snapshot, a split-out Arduino-free
+>   `FrameCodec` with host-side unit tests, and GitHub Actions CI. One
+>   small breaking change: `fetch()` / `fetchType()` /
+>   `processQueuedFrames()` were lowered to `protected`.
+>
+> Both prereleases are flagged `prerelease: true`, so **Arduino Library
+> Manager will not surface them** and existing 1.0.0 installs are
+> unaffected. Roadmap and deferred work live in
+> [`ROADMAP.md`](https://github.com/Love4yzp/Seeed-mmWave-library/blob/v2-dev/ROADMAP.md)
+> on the `v2-dev` branch.
+
 ## Introduction
 
 This Library is designed to interface with the Seeed Studio XIAO ESP32-C6 Board integrated on the [MR60BHA2-XIAO 60GHz mmWave Human Breathing and Heartbeat Sensor](https://www.seeedstudio.com/MR60BHA2-60GHz-mmWave-Sensor-Breathing-and-Heartbeat-Module-p-5945.html) and [MR60FDA2-XIAO 60GHz mmWave Human Fall Detection Sensor](https://www.seeedstudio.com/MR60FDA2-60GHz-mmWave-Sensor-Fall-Detection-Module-p-5946.html)  sensors. This library enables easy data reading and additional operations for functionalities such as breathing and heartbeat monitoring, and fall detection.
