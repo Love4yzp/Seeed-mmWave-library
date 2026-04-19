@@ -1,8 +1,8 @@
 {
 	"name": "Seeed Arduino mmWave",
-	"keywords": "arduino, seeedstudio, mmwave, sensor, breathing, heartbeat, fall detection",
-	"version": "1.0.0",
-	"description": "Arduino library for XIAO to interact with Seeed mmWave modules for breathing, heartbeat, and fall detection.",
+	"keywords": "arduino, seeedstudio, mmwave, sensor, breathing, heartbeat, fall detection, xiao, esp32",
+	"version": "1.1.0",
+	"description": "Drivers for Seeed 60GHz mmWave sensors MR60BHA2 and MR60FDA2 on Seeed XIAO ESP32 boards. Core is dependency-free; extras/ helpers cover the onboard BH1750 and WS2812.",
 	"author": "Seeed Studio",
 	"maintainers": [
 	  {
@@ -20,6 +20,6 @@
 	"homepage": "https://github.com/Love4yzp/seeed-mmWave-library",
 	"license": "MIT",
 	"frameworks": "arduino",
-	"platforms": "*",
+	"platforms": "espressif32",
 	"headers": "Seeed_Arduino_mmWave.h"
 }

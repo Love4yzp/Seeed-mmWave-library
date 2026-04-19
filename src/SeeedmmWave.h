@@ -15,7 +15,7 @@
 #endif
 
 #ifndef ESP32
-#  error "Currently this library only supports ESP32"
+#  error "Seeed_Arduino_mmWave targets Seeed XIAO ESP32 series with Seeed mmWave modules."
 #endif
 
 #include <memory>
@@ -31,7 +31,6 @@
 #  warning "Notice: the uart baud of mmWave serial should be 115200"
 #endif
 
-#define MAX_QUEUE_SIZE    10
 #define FRAME_BUFFER_SIZE 512
 #define SOF_BYTE          0x01
 
@@ -53,11 +52,11 @@
 #  warning "Unable to determine the size end system"
 #endif
 
-#ifndef ESP32
-
+#ifndef MMWAVE_QUEUE_CAPACITY
+#  define MMWAVE_QUEUE_CAPACITY 120
 #endif
-
-#define MMWaveMaxQueueSize 120
+// Back-compat alias; prefer MMWAVE_QUEUE_CAPACITY in new code.
+#define MMWaveMaxQueueSize MMWAVE_QUEUE_CAPACITY
 
 class SeeedmmWave {
  private:

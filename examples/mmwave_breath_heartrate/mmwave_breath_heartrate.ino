@@ -1,13 +1,29 @@
+/*
+ * mmwave_breath_heartrate
+ * -----------------------
+ * Minimal example: print breathing rate, heart rate, distance and phase
+ * readings from a Seeed MR60BHA2 60GHz mmWave sensor.
+ *
+ * Hardware:
+ *   - Seeed XIAO ESP32-C6 (or other XIAO ESP32 series)
+ *   - Seeed MR60BHA2 60GHz mmWave breathing / heartbeat module
+ *
+ * Wiring (carrier board; default factory combo):
+ *   XIAO  <-- UART -->  MR60BHA2 (on-board, 115200 baud)
+ *
+ * Expected serial output (once a subject is in range):
+ *   breath_rate: 16.50
+ *   heart_rate:  72.00
+ *   distance:    0.68
+ */
+
 #include <Arduino.h>
 #include "Seeed_Arduino_mmWave.h"
 
-// If the board is an ESP32, include the HardwareSerial library and create a
-// HardwareSerial object for the mmWave serial communication
 #ifdef ESP32
 #  include <HardwareSerial.h>
 HardwareSerial mmWaveSerial(0);
 #else
-// Otherwise, define mmWaveSerial as Serial1
 #  define mmWaveSerial Serial1
 #endif
 
