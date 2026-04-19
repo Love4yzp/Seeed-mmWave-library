@@ -121,6 +121,13 @@ class SeeedmmWave {
                                    size_t len = 0);
   bool sendFrame(const std::vector<uint8_t>& frame);
 
+  // Frame-pump internals. Subclasses use fetchType() for command-response
+  // round-trips. User sketches should call the public update() instead.
+  void fetch(uint32_t timeout = 1000);
+  bool fetchType(uint16_t data_type = 0xFFFF, uint32_t timeout = 1000);
+  bool processQueuedFrames(uint16_t data_type = 0xFFFF,
+                           uint32_t timeout   = 1000);
+
  public:
   SeeedmmWave() {}
   virtual ~SeeedmmWave() {
@@ -151,12 +158,7 @@ class SeeedmmWave {
    * @retval False otherwise.
    */
   bool update(uint32_t timeout = 100);
-  void fetch(uint32_t timeout = 1000);
-  bool fetchType(uint16_t data_type = 0xFFFF, uint32_t timeout = 1000);
   bool send(uint16_t type, const uint8_t* data = nullptr, size_t data_len = 0);
-
-  bool processQueuedFrames(uint16_t data_type = 0xFFFF,
-                           uint32_t timeout   = 1000);
 
   // --- v2 event subscriptions (additive; polling getters still work) ----
 
