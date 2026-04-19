@@ -1,5 +1,7 @@
 #include "SeeedmmWave.h"
 
+#include "FrameCodec.h"
+
 /**
  * @brief Print the buffer content in hexadecimal format.
  *
@@ -62,11 +64,8 @@ void printHexBuff(const std::vector<uint8_t>& buffer) {
  * length and checksum size to the frame header size.
  */
 size_t SeeedmmWave::expectedFrameLength(const std::vector<uint8_t>& buffer) {
-  if (buffer.size() < SIZE_FRAME_HEADER) {
-    return SIZE_FRAME_HEADER;  // minimum frame header size
-  }
-  size_t len = (buffer[3] << 8) | buffer[4];
-  return SIZE_FRAME_HEADER + len + SIZE_DATA_CKSUM;
+  return seeed::mmwave::FrameCodec::expectedLength(buffer.data(),
+                                                   buffer.size());
 }
 
 /**
@@ -80,12 +79,7 @@ size_t SeeedmmWave::expectedFrameLength(const std::vector<uint8_t>& buffer) {
  * @return The calculated checksum.
  */
 uint8_t SeeedmmWave::calculateChecksum(const uint8_t* data, size_t len) {
-  uint8_t checksum = 0;
-  for (size_t i = 0; i < len; i++) {
-    checksum ^= data[i];
-  }
-  checksum = ~checksum;
-  return checksum;
+  return seeed::mmwave::FrameCodec::checksum(data, len);
 }
 
 /**
@@ -113,21 +107,7 @@ bool SeeedmmWave::validateChecksum(const uint8_t* data, size_t len,
  * @param bytes The byte array to store the converted value.
  */
 void SeeedmmWave::floatToBytes(float value, uint8_t* bytes) {
-  union {
-    float f;
-    uint8_t bytes[sizeof(float)];
-  } floatUnion;
-
-  floatUnion.f = value;
-#if SEEED_WAVE_IS_BIG_ENDIAN == 1
-  for (size_t i = 0; i < sizeof(float); ++i) {
-    bytes[i] = floatUnion.bytes[sizeof(float) - 1 - i];
-  }
-#else
-  for (size_t i = 0; i < sizeof(float); ++i) {
-    bytes[i] = floatUnion.bytes[i];
-  }
-#endif
+  seeed::mmwave::FrameCodec::writeFloatLE(value, bytes);
 }
 
 /**
@@ -139,10 +119,7 @@ void SeeedmmWave::floatToBytes(float value, uint8_t* bytes) {
  * @param bytes The byte array to store the converted value.
  */
 void SeeedmmWave::uint32ToBytes(uint32_t value, uint8_t* bytes) {
-  uint8_t* p = reinterpret_cast<uint8_t*>(&value);
-  for (size_t i = 0; i < sizeof(uint32_t); ++i) {
-    bytes[i] = p[i];
-  }
+  seeed::mmwave::FrameCodec::writeU32LE(value, bytes);
 }
 
 /**
@@ -152,7 +129,7 @@ void SeeedmmWave::uint32ToBytes(uint32_t value, uint8_t* bytes) {
  * @return The extracted float value.
  */
 float SeeedmmWave::extractFloat(const uint8_t* bytes) const {
-  return *reinterpret_cast<const float*>(bytes);
+  return seeed::mmwave::FrameCodec::readFloatLE(bytes);
 }
 
 /**
@@ -165,7 +142,7 @@ float SeeedmmWave::extractFloat(const uint8_t* bytes) const {
  * @return The extracted 32-bit unsigned integer.
  */
 uint32_t SeeedmmWave::extractU32(const uint8_t* bytes) const {
-  return *reinterpret_cast<const uint32_t*>(bytes);
+  return seeed::mmwave::FrameCodec::readU32LE(bytes);
 }
 
 /**
@@ -248,28 +225,15 @@ size_t SeeedmmWave::write(const char* buffer, size_t size) {
  */
 bool SeeedmmWave::processFrame(const uint8_t* frame_bytes, size_t len,
                                uint16_t data_type) {
-  if (len < SIZE_FRAME_HEADER)
-    return false;  // Not enough data to process header
-
-  uint16_t id        = (frame_bytes[1] << 8) | frame_bytes[2];
-  uint16_t data_len  = (frame_bytes[3] << 8) | frame_bytes[4];
-  uint16_t type      = (frame_bytes[5] << 8) | frame_bytes[6];
-  uint8_t head_cksum = frame_bytes[7];
-  uint8_t data_cksum = frame_bytes[SIZE_FRAME_HEADER + data_len];
-
-  // Only proceed if the type matches or if data_type is set to the default,
-  // indicating no specific type is required
-  if (data_type != 0xFFFF && data_type != type)
-    return false;
-  // Checksum validation6
-  if (!validateChecksum(frame_bytes, SIZE_FRAME_HEADER - SIZE_DATA_CKSUM,
-                        head_cksum) ||
-      !validateChecksum(&frame_bytes[SIZE_FRAME_HEADER], data_len,
-                        data_cksum)) {
+  seeed::mmwave::DecodedFrame f;
+  if (seeed::mmwave::FrameCodec::tryDecode(frame_bytes, len, f) !=
+      seeed::mmwave::Status::Ok) {
     return false;
   }
-
-  return handleType(type, &frame_bytes[SIZE_FRAME_HEADER], data_len);
+  if (data_type != 0xFFFF && data_type != f.type) {
+    return false;
+  }
+  return handleType(f.type, f.data, f.data_len);
 }
 
 std::vector<uint8_t> SeeedmmWave::packetFrame(uint16_t type,
