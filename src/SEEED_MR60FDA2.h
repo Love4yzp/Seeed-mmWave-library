@@ -12,6 +12,8 @@
 #ifndef SEEED_MR60FDA2_H
 #define SEEED_MR60FDA2_H
 
+#include <functional>
+
 #include "SeeedmmWave.h"
 
 enum class TypeFallDetection : uint16_t {
@@ -92,6 +94,27 @@ class SEEED_MR60FDA2 : public SeeedmmWave {
   bool getHuman(bool &is_human);
   bool getFall();
   bool getHuman();
+
+  // --- v2 event subscriptions (additive) ------------------------------
+  //
+  // Each callback fires from within update() whenever a frame of the
+  // corresponding type parses successfully. Handlers run on the same task
+  // that calls update(); do not block, do not call update() from inside.
+  //
+  using BoolCallback             = std::function<void(bool)>;
+  using RadarParametersCallback  = std::function<void(float height, float threshold,
+                                                      uint32_t sensitivity,
+                                                      float rect_XL, float rect_XR,
+                                                      float rect_ZF, float rect_ZB)>;
+
+  void onFall(BoolCallback cb)                        { _onFall             = std::move(cb); }
+  void onHuman(BoolCallback cb)                       { _onHuman            = std::move(cb); }
+  void onRadarParameters(RadarParametersCallback cb)  { _onRadarParameters  = std::move(cb); }
+
+ private:
+  BoolCallback            _onFall;
+  BoolCallback            _onHuman;
+  RadarParametersCallback _onRadarParameters;
 };
 
 #endif /*SEEED_MR60FDA2_H*/

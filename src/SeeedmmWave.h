@@ -18,8 +18,11 @@
 #  error "Seeed_Arduino_mmWave targets Seeed XIAO ESP32 series with Seeed mmWave modules."
 #endif
 
+#include <functional>
 #include <memory>
 #include <queue>
+
+#include "Status.h"
 
 #ifndef _MMWAVE_DEBUG
   #define _MMWAVE_DEBUG 0
@@ -59,6 +62,18 @@
 #define MMWaveMaxQueueSize MMWAVE_QUEUE_CAPACITY
 
 class SeeedmmWave {
+ public:
+  struct Stats {
+    uint32_t framesRx            = 0;  // Frames that parsed successfully.
+    uint32_t checksumErrors      = 0;  // Header or data checksum failures.
+    uint32_t droppedByQueueFull  = 0;  // Oldest frame discarded because queue filled.
+    uint32_t bytesRx             = 0;  // Total bytes pulled from the UART.
+    seeed::mmwave::Status lastError = seeed::mmwave::Status::Ok;
+  };
+
+  using FrameCallback = std::function<void(uint16_t type, const uint8_t* data, size_t len)>;
+  using ErrorCallback = std::function<void(seeed::mmwave::Status status)>;
+
  private:
   HardwareSerial* _serial;
   uint32_t _baud;
@@ -66,7 +81,16 @@ class SeeedmmWave {
 
   std::queue<std::vector<uint8_t>> byteQueue;
 
+  Stats _stats{};
+  FrameCallback _onFrame;
+  ErrorCallback _onError;
+
  protected:
+  // Fire frame-level callback + increment framesRx. Called by processFrame
+  // after a successful handleType dispatch; subclasses normally do not need
+  // to call this directly.
+  void fireFrame(uint16_t type, const uint8_t* data, size_t len);
+  void fireError(seeed::mmwave::Status s);
   size_t expectedFrameLength(const std::vector<uint8_t>& buffer);
   uint8_t calculateChecksum(const uint8_t* data, size_t len);
   bool validateChecksum(const uint8_t* data, size_t len,
@@ -134,6 +158,19 @@ class SeeedmmWave {
   bool processQueuedFrames(uint16_t data_type = 0xFFFF,
                            uint32_t timeout   = 1000);
 
+  // --- v2 event subscriptions (additive; polling getters still work) ----
+
+  // Fires on every frame that passes both checksums and is dispatched to the
+  // device subclass. Useful for debug/sniffing or for handling custom frame
+  // types the subclass does not know about.
+  void onFrame(FrameCallback cb) { _onFrame = std::move(cb); }
+
+  // Fires when a frame is dropped due to a decode failure or queue overflow.
+  void onError(ErrorCallback cb) { _onError = std::move(cb); }
+
+  // Snapshot of the running counters since begin().
+  const Stats& stats() const { return _stats; }
+  void resetStats() { _stats = Stats{}; }
 };
 
 void printHexBuff(const std::vector<uint8_t>& buffer);

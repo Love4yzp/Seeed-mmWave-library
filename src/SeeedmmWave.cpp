@@ -223,17 +223,33 @@ size_t SeeedmmWave::write(const char* buffer, size_t size) {
  * @param data_type The expected data type of the frame. Defaults to 0xFFFF.
  * @return True if the frame is successfully processed, false otherwise.
  */
+void SeeedmmWave::fireFrame(uint16_t type, const uint8_t* data, size_t len) {
+  _stats.framesRx++;
+  if (_onFrame) _onFrame(type, data, len);
+}
+
+void SeeedmmWave::fireError(seeed::mmwave::Status s) {
+  _stats.lastError = s;
+  if (s == seeed::mmwave::Status::ChecksumError) _stats.checksumErrors++;
+  if (_onError) _onError(s);
+}
+
 bool SeeedmmWave::processFrame(const uint8_t* frame_bytes, size_t len,
                                uint16_t data_type) {
   seeed::mmwave::DecodedFrame f;
-  if (seeed::mmwave::FrameCodec::tryDecode(frame_bytes, len, f) !=
-      seeed::mmwave::Status::Ok) {
+  auto st = seeed::mmwave::FrameCodec::tryDecode(frame_bytes, len, f);
+  if (st != seeed::mmwave::Status::Ok) {
+    fireError(st);
     return false;
   }
   if (data_type != 0xFFFF && data_type != f.type) {
     return false;
   }
-  return handleType(f.type, f.data, f.data_len);
+  const bool dispatched = handleType(f.type, f.data, f.data_len);
+  if (dispatched) {
+    fireFrame(f.type, f.data, f.data_len);
+  }
+  return dispatched;
 }
 
 std::vector<uint8_t> SeeedmmWave::packetFrame(uint16_t type,
@@ -318,6 +334,7 @@ void SeeedmmWave::fetch(uint32_t timeout) {
     size_t c_available = _serial->available();
     while (c_available--) {
       uint8_t byte = _serial->read();
+      _stats.bytesRx++;
       if (startFrame)  // Frame processing
       {
         frameBuffer.push_back(byte);
@@ -334,7 +351,8 @@ void SeeedmmWave::fetch(uint32_t timeout) {
               (SIZE_FRAME_HEADER + frameDataSize + SIZE_DATA_CKSUM)) {
             if (byteQueue.size() >= MMWaveMaxQueueSize) {
               byteQueue.pop();  // Discard the oldest frame
-              // Serial.println("Queue full, discarding oldest frame");
+              _stats.droppedByQueueFull++;
+              fireError(seeed::mmwave::Status::Busy);
             }
 #if _MMWAVE_DEBUG == 1
             printHexBuff(frameBuffer);

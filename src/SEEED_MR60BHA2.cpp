@@ -22,27 +22,35 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       _heart_breath.breath_phase = extractFloat(data + sizeof(float));
       _heart_breath.heart_phase  = extractFloat(data + 2 * sizeof(float));
       _isHeartBreathPhaseValid   = true;
+      if (_onHeartBreathPhases)
+        _onHeartBreathPhases(_heart_breath.total_phase,
+                             _heart_breath.breath_phase,
+                             _heart_breath.heart_phase);
       break;
     }
     case TypeHeartBreath::TypeBreathRate: {
       _breath_rate       = extractFloat(data);
       _isBreathRateValid = true;
+      if (_onBreathRate) _onBreathRate(_breath_rate);
       break;
     }
     case TypeHeartBreath::TypeHeartRate: {
       _heart_rate       = extractFloat(data);
       _isHeartRateValid = true;
+      if (_onHeartRate) _onHeartRate(_heart_rate);
       break;
     }
     case TypeHeartBreath::TypeHeartBreathDistance: {
       _rangeFlag       = extractU32(data);
       _range           = extractFloat(data + sizeof(uint32_t));
       _isDistanceValid = true;
+      if (_onDistance && _rangeFlag) _onDistance(_range);
       break;
     }
     case TypeHeartBreath::ReportHumanDetection: {
       _isHumanDetected = data[0];
       _isHumanDetectionValid = true;
+      if (_onPresence) _onPresence(_isHumanDetected);
       break;
     }
     case TypeHeartBreath::Report3DPointCloudDetection: {
@@ -73,6 +81,7 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       // Store the received target data in the PeopleCounting object
       _people_counting_point_cloud.targets = std::move(received_targets);
       _isPeopleCountingPointCloudValid = true;
+      if (_onPointCloud) _onPointCloud(_people_counting_point_cloud);
 
       break;
     }
@@ -104,12 +113,14 @@ bool SEEED_MR60BHA2::handleType(uint16_t _type, const uint8_t* data,
       // Store the received target data in the PeopleCounting object
       _people_counting_target_info.targets = std::move(received_targets);
       _isPeopleCountingTargetInfoValid = true;
+      if (_onTargetInfo) _onTargetInfo(_people_counting_target_info);
 
       break;
     }
     case TypeHeartBreath::ReportFirmware: {
       _firmware_info.value = extractU32(data);
       _isFirmwareInfoValid = true;
+      if (_onFirmwareInfo) _onFirmwareInfo(_firmware_info);
       break;
     }
     default:

@@ -13,6 +13,8 @@
 #ifndef SEEED_MR60BHA2_H
 #define SEEED_MR60BHA2_H
 
+#include <functional>
+
 #include "SeeedmmWave.h"
 
 #define MAX_TARGET_NUM    3
@@ -112,6 +114,37 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   bool getPeopleCountingTargetInfo(PeopleCounting& target_info);
   bool isHumanDetected();
   bool getFirmwareInfo(FirmwareInfo& firmware_info);
+
+  // --- v2 event subscriptions (additive) ------------------------------
+  //
+  // Each callback fires from within update() whenever a frame of the
+  // corresponding type parses successfully. Handlers run on the same task
+  // that calls update(); do not block, do not call update() from inside.
+  //
+  using HeartBreathPhasesCallback = std::function<void(float, float, float)>;
+  using FloatCallback             = std::function<void(float)>;
+  using BoolCallback              = std::function<void(bool)>;
+  using PeopleCountingCallback    = std::function<void(const PeopleCounting&)>;
+  using FirmwareInfoCallback      = std::function<void(const FirmwareInfo&)>;
+
+  void onHeartBreathPhases(HeartBreathPhasesCallback cb) { _onHeartBreathPhases = std::move(cb); }
+  void onBreathRate(FloatCallback cb)                    { _onBreathRate        = std::move(cb); }
+  void onHeartRate(FloatCallback cb)                     { _onHeartRate         = std::move(cb); }
+  void onDistance(FloatCallback cb)                      { _onDistance          = std::move(cb); }
+  void onPresence(BoolCallback cb)                       { _onPresence          = std::move(cb); }
+  void onPointCloud(PeopleCountingCallback cb)           { _onPointCloud        = std::move(cb); }
+  void onTargetInfo(PeopleCountingCallback cb)           { _onTargetInfo        = std::move(cb); }
+  void onFirmwareInfo(FirmwareInfoCallback cb)           { _onFirmwareInfo      = std::move(cb); }
+
+ private:
+  HeartBreathPhasesCallback _onHeartBreathPhases;
+  FloatCallback             _onBreathRate;
+  FloatCallback             _onHeartRate;
+  FloatCallback             _onDistance;
+  BoolCallback              _onPresence;
+  PeopleCountingCallback    _onPointCloud;
+  PeopleCountingCallback    _onTargetInfo;
+  FirmwareInfoCallback      _onFirmwareInfo;
 };
 
 #endif /*SEEED_MR60BHA2_H*/
