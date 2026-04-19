@@ -181,10 +181,7 @@ abstraction is needed.
 * **FreeRTOS / multi-task usage.** The library is intended for single-task
   polling. Call `update()` from exactly one task and keep it out of ISRs.
 
-## v2 additions (event callbacks, Status, stats)
-
-v2 introduces an event-driven API next to the polling getters. Both are
-supported; pick whichever reads better for your sketch.
+## Event callbacks, Status, stats
 
 ```cpp
 SEEED_MR60BHA2 mmWave;
@@ -201,28 +198,12 @@ void loop() {
 }
 ```
 
-Every `bool get*(&out)` now has a `Status read*(&out)` sibling that distinguishes
+Every polling getter also has a `Status read*(&out)` sibling that distinguishes
 `Ok` from `NoData`. See `examples/mmwave_event_callbacks` for a full sketch.
 
-### Upgrading from v1 to v2
-
-v2 is source-compatible with existing v1 sketches — none of the public
-polling getters or `update()`/`send()` signatures changed. The notable
-differences are:
-
-| Area                                  | v1                                | v2                                                   |
-| ------------------------------------- | --------------------------------- | ---------------------------------------------------- |
-| `fetch()` / `fetchType()` / `processQueuedFrames()` | public on `SeeedmmWave`           | **protected** — internal plumbing, call `update()` instead |
-| Per-datum getters                     | `bool getBreathRate(&)` etc.      | still there; **also** `Status readBreathRate(&)`     |
-| Error signalling                      | silent `false` from `update()`    | `mmWave.onError(cb)` + `stats().checksumErrors`      |
-| Event subscriptions                   | –                                 | `onBreathRate` / `onFall` / `onError` / …            |
-| Dead enum `MMWAVE_DEVICE`             | present (and misnamed)            | removed (was never referenced)                       |
-| `MAX_QUEUE_SIZE` macro                | present, dead                     | removed                                              |
-| Queue capacity macro                  | `MMWaveMaxQueueSize` (fixed 120)  | `MMWAVE_QUEUE_CAPACITY` (default 120, `-D` override) |
-
-If your sketch only calls `begin`, `update`, `send`, `getBreathRate`,
-`getHeartRate`, `getFall`, `getHuman`, or `setXxx` — it compiles and runs on
-v2 unchanged.
+> Coming from **v1.x**? v2 is a major release and is not guaranteed
+> source-compatible. If you have an existing sketch that you do not plan to
+> update, pin your dependency to the latest **v1.x** release.
 
 ## License
 
