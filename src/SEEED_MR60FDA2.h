@@ -95,6 +95,20 @@ class SEEED_MR60FDA2 : public SeeedmmWave {
   bool getFall();
   bool getHuman();
 
+  // --- v2 Status-based read API (additive) ---------------------------
+  //
+  // Returns Status::Ok when cached state is available (the sensor caches
+  // the latest decision; there is no one-shot semantic here) or
+  // Status::NoData if no frame of that type has arrived yet.
+  seeed::mmwave::Status readFall(bool& is_fall);
+  seeed::mmwave::Status readHuman(bool& is_human);
+  seeed::mmwave::Status readRadarParameters(float& height, float& threshold,
+                                            uint32_t& sensitivity);
+  seeed::mmwave::Status readRadarParameters(float& height, float& threshold,
+                                            uint32_t& sensitivity,
+                                            float& rect_XL, float& rect_XR,
+                                            float& rect_ZF, float& rect_ZB);
+
   // --- v2 event subscriptions (additive) ------------------------------
   //
   // Each callback fires from within update() whenever a frame of the

@@ -115,6 +115,21 @@ class SEEED_MR60BHA2 : public SeeedmmWave {
   bool isHumanDetected();
   bool getFirmwareInfo(FirmwareInfo& firmware_info);
 
+  // --- v2 Status-based read API (additive) ---------------------------
+  //
+  // Returns Status::Ok when a fresh frame was consumed, Status::NoData
+  // when nothing has arrived since the last read. The underlying cache
+  // is shared with the bool get*() family — reading via either path
+  // clears the "new data" flag.
+  seeed::mmwave::Status readHeartBreathPhases(float& total, float& breath, float& heart);
+  seeed::mmwave::Status readBreathRate(float& rate);
+  seeed::mmwave::Status readHeartRate(float& rate);
+  seeed::mmwave::Status readDistance(float& distance);
+  seeed::mmwave::Status readPresence(bool& present);
+  seeed::mmwave::Status readPointCloud(PeopleCounting& point_cloud);
+  seeed::mmwave::Status readTargetInfo(PeopleCounting& target_info);
+  seeed::mmwave::Status readFirmwareInfo(FirmwareInfo& firmware_info);
+
   // --- v2 event subscriptions (additive) ------------------------------
   //
   // Each callback fires from within update() whenever a frame of the

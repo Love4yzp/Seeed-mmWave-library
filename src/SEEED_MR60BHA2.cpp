@@ -194,5 +194,42 @@ bool SEEED_MR60BHA2::getFirmwareInfo(FirmwareInfo& firmware_info) {
     return false;
   _isFirmwareInfoValid = false;
   firmware_info = std::move(_firmware_info);
-  return true;  
+  return true;
+}
+
+using seeed::mmwave::Status;
+
+Status SEEED_MR60BHA2::readHeartBreathPhases(float& total, float& breath, float& heart) {
+  return getHeartBreathPhases(total, breath, heart) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readBreathRate(float& rate) {
+  return getBreathRate(rate) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readHeartRate(float& rate) {
+  return getHeartRate(rate) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readDistance(float& distance) {
+  return getDistance(distance) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readPresence(bool& present) {
+  if (!_isHumanDetectionValid) return Status::NoData;
+  _isHumanDetectionValid = false;
+  present = _isHumanDetected;
+  return Status::Ok;
+}
+
+Status SEEED_MR60BHA2::readPointCloud(PeopleCounting& point_cloud) {
+  return getPeopleCountingPointCloud(point_cloud) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readTargetInfo(PeopleCounting& target_info) {
+  return getPeopleCountingTargetInfo(target_info) ? Status::Ok : Status::NoData;
+}
+
+Status SEEED_MR60BHA2::readFirmwareInfo(FirmwareInfo& firmware_info) {
+  return getFirmwareInfo(firmware_info) ? Status::Ok : Status::NoData;
 }

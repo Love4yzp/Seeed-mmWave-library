@@ -322,3 +322,39 @@ bool SEEED_MR60FDA2::getFallInternal() {
   _isFallValid = false;
   return _isFall;
 }
+
+using seeed::mmwave::Status;
+
+Status SEEED_MR60FDA2::readFall(bool& is_fall) {
+  if (!_isFallValid) return Status::NoData;
+  is_fall = _isFall;
+  return Status::Ok;
+}
+
+Status SEEED_MR60FDA2::readHuman(bool& is_human) {
+  if (!_isHumanValid) return Status::NoData;
+  is_human = _isHuman;
+  return Status::Ok;
+}
+
+Status SEEED_MR60FDA2::readRadarParameters(float& height, float& threshold,
+                                           uint32_t& sensitivity) {
+  float xl, xr, zf, zb;
+  return readRadarParameters(height, threshold, sensitivity, xl, xr, zf, zb);
+}
+
+Status SEEED_MR60FDA2::readRadarParameters(float& height, float& threshold,
+                                           uint32_t& sensitivity, float& rect_XL,
+                                           float& rect_XR, float& rect_ZF,
+                                           float& rect_ZB) {
+  if (!_parametersValid) return Status::NoData;
+  height       = _height;
+  threshold    = _thershold;
+  sensitivity  = _sensitivity;
+  rect_XL      = _rect_XL;
+  rect_XR      = _rect_XR;
+  rect_ZF      = _rect_ZF;
+  rect_ZB      = _rect_ZB;
+  _parametersValid = false;
+  return Status::Ok;
+}
