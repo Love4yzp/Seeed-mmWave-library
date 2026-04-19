@@ -1,7 +1,7 @@
 {
 	"name": "Seeed Arduino mmWave",
 	"keywords": "arduino, seeedstudio, mmwave, sensor, breathing, heartbeat, fall detection, xiao, esp32",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "Drivers for Seeed 60GHz mmWave sensors MR60BHA2 and MR60FDA2 on Seeed XIAO ESP32 boards. Core is dependency-free; extras/ helpers cover the onboard BH1750 and WS2812.",
 	"author": "Seeed Studio",
 	"maintainers": [

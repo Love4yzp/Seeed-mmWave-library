@@ -13,7 +13,7 @@
 #ifndef Seeed_Arduino_mmWave_H
 #define Seeed_Arduino_mmWave_H
 
-#define SEEED_ARDUINO_MMWAVE_VERSION "1.1.0"
+#define SEEED_ARDUINO_MMWAVE_VERSION "2.0.0"
 
 #include "SEEED_MR60BHA2.h"
 #include "SEEED_MR60FDA2.h"

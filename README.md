@@ -181,21 +181,48 @@ abstraction is needed.
 * **FreeRTOS / multi-task usage.** The library is intended for single-task
   polling. Call `update()` from exactly one task and keep it out of ISRs.
 
-## Roadmap (v2.0, breaking)
+## v2 additions (event callbacks, Status, stats)
 
-The following changes are planned for the next major release. They will live
-on a `v2` branch first and ship with a migration table in the GitHub Release
-notes:
+v2 introduces an event-driven API next to the polling getters. Both are
+supported; pick whichever reads better for your sketch.
 
-* Event / callback API: `onBreathRate`, `onHeartRate`, `onFall`, `onError`, …
-* `Status` enum return values replacing `bool` (distinguish *no data*,
-  *timeout*, *checksum error*, *type mismatch*).
-* `update()` → `poll()`, `get*` → `read*` with `Status` returns.
-* Dedicated pending-response channel so configuration ACKs no longer compete
-  with data frames for queue space.
-* Atomic state / mutex-protected queue for safe FreeRTOS multi-task use.
-* `FrameCodec` split out for host-side unit testing.
-* GitHub Actions compile matrix + `arduino-lint`.
+```cpp
+SEEED_MR60BHA2 mmWave;
+
+mmWave.onBreathRate([](float r)            { Serial.printf("breath %.2f\n", r); });
+mmWave.onHeartRate([](float r)             { Serial.printf("heart  %.2f\n", r); });
+mmWave.onPresence([](bool present)         { Serial.printf("in room: %d\n", present); });
+mmWave.onError([](seeed::mmwave::Status s) { Serial.println(seeed::mmwave::statusName(s)); });
+
+void loop() {
+  mmWave.update(100);
+  const auto& s = mmWave.stats();
+  // s.framesRx, s.checksumErrors, s.droppedByQueueFull, s.bytesRx
+}
+```
+
+Every `bool get*(&out)` now has a `Status read*(&out)` sibling that distinguishes
+`Ok` from `NoData`. See `examples/mmwave_event_callbacks` for a full sketch.
+
+### Upgrading from v1 to v2
+
+v2 is source-compatible with existing v1 sketches — none of the public
+polling getters or `update()`/`send()` signatures changed. The notable
+differences are:
+
+| Area                                  | v1                                | v2                                                   |
+| ------------------------------------- | --------------------------------- | ---------------------------------------------------- |
+| `fetch()` / `fetchType()` / `processQueuedFrames()` | public on `SeeedmmWave`           | **protected** — internal plumbing, call `update()` instead |
+| Per-datum getters                     | `bool getBreathRate(&)` etc.      | still there; **also** `Status readBreathRate(&)`     |
+| Error signalling                      | silent `false` from `update()`    | `mmWave.onError(cb)` + `stats().checksumErrors`      |
+| Event subscriptions                   | –                                 | `onBreathRate` / `onFall` / `onError` / …            |
+| Dead enum `MMWAVE_DEVICE`             | present (and misnamed)            | removed (was never referenced)                       |
+| `MAX_QUEUE_SIZE` macro                | present, dead                     | removed                                              |
+| Queue capacity macro                  | `MMWaveMaxQueueSize` (fixed 120)  | `MMWAVE_QUEUE_CAPACITY` (default 120, `-D` override) |
+
+If your sketch only calls `begin`, `update`, `send`, `getBreathRate`,
+`getHeartRate`, `getFall`, `getHuman`, or `setXxx` — it compiles and runs on
+v2 unchanged.
 
 ## License
 
