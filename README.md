@@ -184,7 +184,8 @@ abstraction is needed.
 ## Roadmap (v2.0, breaking)
 
 The following changes are planned for the next major release. They will live
-on a `v2` branch first and ship with a migration table in the `CHANGELOG`:
+on a `v2` branch first and ship with a migration table in the GitHub Release
+notes:
 
 * Event / callback API: `onBreathRate`, `onHeartRate`, `onFall`, `onError`, …
 * `Status` enum return values replacing `bool` (distinguish *no data*,
