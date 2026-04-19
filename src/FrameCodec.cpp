@@ -37,7 +37,9 @@ uint8_t FrameCodec::checksum(const uint8_t* data, size_t len) {
 }
 
 size_t FrameCodec::expectedLength(const uint8_t* buf, size_t len) {
-  if (len < kHeaderSize) return kMinFrameSize;
+  // LEN field sits at bytes 3-4, so we can project the full frame size as
+  // soon as we have at least five bytes in hand.
+  if (len <= kIdxLenLo) return kMinFrameSize;
   size_t data_len =
       (static_cast<size_t>(buf[kIdxLenHi]) << 8) | buf[kIdxLenLo];
   return kHeaderSize + data_len + kDataChecksum;
